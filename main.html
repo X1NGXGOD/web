@@ -6,52 +6,69 @@
     <title>Eclipse Chat</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background-color: #1b1f24;
+            color: #f5f5f5;
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .container {
             max-width: 400px;
-            margin: 50px auto;
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: #2b3036;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
         .chat-name {
-            font-size: 24px;
+            font-size: 32px;
             font-weight: bold;
-            margin-bottom: 10px;
+            color: #ffcc00;
+            margin-bottom: 15px;
         }
         .chat-description {
-            font-size: 16px;
-            color: #555;
-            margin-bottom: 20px;
+            font-size: 18px;
+            color: #b0b3b8;
+            margin-bottom: 25px;
+            line-height: 1.6;
         }
         .create-secret-chat {
-            background-color: #007bff;
+            background: linear-gradient(45deg, #ff7e5f, #feb47b);
             color: white;
             border: none;
-            padding: 10px;
-            text-align: center;
-            border-radius: 5px;
-            cursor: pointer;
-            display: block;
+            padding: 15px;
             width: 100%;
+            border-radius: 8px;
             font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
         }
         .create-secret-chat:hover {
-            background-color: #0056b3;
+            background: linear-gradient(45deg, #feb47b, #ff7e5f);
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="chat-name">Chat Name</div>
-    <div class="chat-description">Chat description Chat description Chat description Chat description Chat description</div>
-    <button class="create-secret-chat">Create new secret chat</button>
+    <div class="chat-name">Eclipse Chat</div>
+    <div class="chat-description">
+        Step into the Eclipse. Where conversations meet mystery, and whispers travel through the dark. Connect, share, and chat in secret.
+    </div>
+    <button class="create-secret-chat">Create New Secret Chat</button>
+    <div class="footer">
+        &copy; 2024 Eclipse Chat. All Rights Reserved.
+    </div>
 </div>
 
 </body>
