@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eclipse Chat</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -30,7 +34,106 @@
             z-index: -1;
             overflow: hidden;
         }
-    
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.6), 
+                        0 0 40px rgba(255, 0, 255, 0.6),
+                        0 0 60px rgba(0, 255, 255, 0.6),
+                        0 0 80px rgba(255, 174, 0, 0.6),
+                        0 0 100px rgba(255, 255, 0, 0.6);
+            animation: rotate 10s infinite linear, glow 2s infinite ease-in-out;
+        }
+        .circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: 20%;
+            left: 10%;
+            animation-duration: 12s;
+        }
+        .circle:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 40%;
+            animation-duration: 10s;
+            animation-direction: reverse;
+        }
+        .circle:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            top: 80%;
+            left: 30%;
+            animation-duration: 15s;
+        }
+        .circle:nth-child(4) {
+            width: 150px;
+            height: 150px;
+            top: 30%;
+            left: 70%;
+            animation-duration: 14s;
+            animation-direction: reverse;
+        }
+        .circle:nth-child(5) {
+            width: 250px;
+            height: 250px;
+            top: 10%;
+            left: 80%;
+            animation-duration: 18s;
+        }
+        .circle:nth-child(6) {
+            width: 180px;
+            height: 180px;
+            top: 60%;
+            left: 20%;
+            animation-duration: 16s;
+            animation-direction: reverse;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.6), 
+                            0 0 40px rgba(255, 0, 255, 0.6),
+                            0 0 60px rgba(0, 255, 255, 0.6),
+                            0 0 80px rgba(255, 196, 0, 0.6),
+                            0 0 100px rgba(255, 255, 0, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 0, 0, 0.8),
+                            0 0 60px rgba(255, 0, 255, 0.8),
+                            0 0 90px rgba(0, 255, 255, 0.8),
+                            0 0 120px rgba(255, 196, 0, 0.6),
+                            0 0 150px rgba(255, 255, 0, 0.8);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.6),
+                            0 0 40px rgba(255, 0, 255, 0.6),
+                            0 0 60px rgba(0, 255, 255, 0.6),
+                            0 0 80px rgba(255, 196, 0, 0.6),
+                            0 0 100px rgba(255, 255, 0, 0.6);
+            }
+        }
+
+        /* Main container */
+        .container {
+            max-width: 400px;
+            background-color: #2b3036;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            z-index: 1;
+        }
 
         .chat-name {
             font-size: 32px;
@@ -80,19 +183,31 @@
         .footer {
             margin-top: 20px;
             font-size: 14px;
-            color: #5f5f5f;
+            color: #888;
         }
     </style>
 </head>
 <body>
-    
+
+<div class="background">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+</div>
+
 <div class="container">
     <div class="chat-name">Eclipse Chat</div>
     <div class="chat-description">
         Занурюйся у світ тіней, де кожне слово приховує загадку. Спілкуйся без зайвих очей, розкривай секрети лише тим, кому довіряєш. Ласкаво просимо до Eclipse — де тиша каже більше, ніж слова.
     </div>
-    <button class="create-secret-chat">Створити таємний чат</button>
+    <button class="create-secret-chat btn btn-primary btn-block">Створити таємний чат</button>
 </div>
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
 </body>
 </html>
