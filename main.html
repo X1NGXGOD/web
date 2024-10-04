@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eclipse Chat</title>
 
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 
     <style>
@@ -32,6 +33,7 @@
             z-index: -1;
             overflow: hidden;
         }
+
         .circle {
             position: absolute;
             border-radius: 50%;
@@ -43,6 +45,7 @@
                         0 0 100px rgba(255, 255, 0, 0.6);
             animation: rotate 20s infinite linear, glow 2s infinite ease-in-out;
         }
+
         .container {
             max-width: 400px;
             background-color: #2b3036;
@@ -51,6 +54,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             text-align: center;
             z-index: 1;
+            position: relative; /* Added for positioning the button */
         }
 
         .chat-name {
@@ -67,7 +71,7 @@
             line-height: 1.6;
         }
 
-        .create-secret-chat {
+        .create-chat {
             background: linear-gradient(90deg, #ff7e5f, #feb47b);
             color: white;
             border: none;
@@ -80,10 +84,29 @@
             transition: background 0.5s ease, transform 0.3s ease;
             background-size: 200% 200%;
             animation: gradient-flow 3s ease infinite;
+            margin-top: 10px;
         }
 
-        .create-secret-chat:hover {
+        .create-chat:hover {
             transform: scale(1.05);
+        }
+
+        .enter-chat {
+            background: linear-gradient(90deg, #ff7e5f, #feb47b); /* Matching color with create-chat */
+            color: white;
+            border: none;
+            padding: 15px; /* Adjusted padding */
+            width: 100%; /* Match width */
+            border-radius: 8px; /* Match border-radius */
+            font-size: 18px; /* Match font size */
+            font-weight: bold; /* Match font weight */
+            cursor: pointer;
+            transition: background 0.5s ease;
+            margin-top: 15px; /* Added margin for spacing */
+        }
+
+        .enter-chat:hover {
+            background: #feb47b; /* Adjust hover color */
         }
 
         @keyframes gradient-flow {
@@ -98,10 +121,33 @@
             }
         }
 
+        .modal-content {
+            background-color: #2b3036;
+            color: white;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #ffcc00;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #ffcc00;
+        }
+
         .footer {
             margin-top: 20px;
             font-size: 14px;
             color: #888;
+        }
+
+        .private-link {
+            margin-top: 10px;
+            color: #ffc107;
+            display: none;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -121,15 +167,105 @@
     <div class="chat-description">
         Занурюйся у світ тіней, де кожне слово приховує загадку. Спілкуйся без зайвих очей, розкривай секрети лише тим, кому довіряєш. Ласкаво просимо до Eclipse — де тиша каже більше, ніж слова.
     </div>
-    <button class="create-secret-chat btn btn-primary btn-block" id="secretChatBtn">Створити таємний чат</button>
+    <button class="create-chat btn btn-primary btn-block" data-toggle="modal" data-target="#createChatModal">Створити чат</button>
+    
+    <button class="enter-chat btn btn-primary" onclick="window.location.href='login.html'">Увійти в чат</button>
+</div>
+
+<div id="createChatModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Створення нового чату</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="chatName">Назва чату:</label>
+                        <input type="text" class="form-control" id="chatName" placeholder="Введіть назву чату">
+                    </div>
+                    <div class="form-group">
+                        <label for="chatDescription">Опис чату:</label>
+                        <textarea class="form-control" id="chatDescription" placeholder="Введіть опис чату"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="chatType">Тип чату:</label><br>
+                        <label class="radio-inline"><input type="radio" name="chatType" value="public" checked> Публічний</label>
+                        <label class="radio-inline"><input type="radio" name="chatType" value="private"> Приватний</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="createChatButton">Створити</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрити</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="passwordModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Встановлення паролю для чату</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="chatPassword">Пароль чату:</label>
+                    <input type="password" class="form-control" id="chatPassword" placeholder="Введіть пароль">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="setPasswordButton">Зберегти пароль</button>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
 <script>
-    document.getElementById("secretChatBtn").addEventListener("click", function() {
-        window.location.href = "https://google.com"; 
+    var chatLink = ""; 
+
+    document.getElementById("createChatButton").addEventListener("click", function() {
+        var chatName = document.getElementById("chatName").value;
+        var chatDescription = document.getElementById("chatDescription").value;
+        var chatType = document.querySelector('input[name="chatType"]:checked').value;
+
+        if (chatName && chatDescription) {
+            if (chatType === "private") {
+                chatLink = "https://eclipsechat.com/private/" + Math.random().toString(36).substring(7);
+            } else {
+                chatLink = "https://eclipsechat.com/public/" + Math.random().toString(36).substring(7);
+                $('#passwordModal').modal('show'); 
+            }
+            $('#createChatModal').modal('hide');
+        } else {
+            alert("Будь ласка, заповніть всі поля.");
+        }
+    });
+
+    document.getElementById("setPasswordButton").addEventListener("click", function() {
+        var password = document.getElementById("chatPassword").value;
+        if (password) {
+            alert("Пароль встановлено: " + password);
+            $('#passwordModal').modal('hide');
+        } else {
+            alert("Будь ласка, введіть пароль.");
+        }
+    });
+
+    document.getElementById("enterChatButton").addEventListener("click", function() {
+        if (chatLink) {
+            window.location.href = chatLink;
+        }
     });
 </script>
 
