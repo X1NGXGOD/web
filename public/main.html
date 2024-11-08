@@ -1,274 +1,224 @@
 <!DOCTYPE html>
-<html lang="ua">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eclipse Chat</title>
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-
+    <title>WebSocket Chat</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #1b1f24;
-            color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow: hidden;
-            position: relative;
-            background: radial-gradient(circle, #1b1f24, #000000);
+            box-sizing: border-box;
         }
 
-        .background {
-            position: absolute;
-            top: 0;
-            left: 0;
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        #connect-section, #registration-section, #chat-section {
             width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .circle {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.6), 
-                        0 0 40px rgba(255, 0, 255, 0.6),
-                        0 0 60px rgba(0, 255, 255, 0.6),
-                        0 0 80px rgba(255, 174, 0, 0.6),
-                        0 0 100px rgba(255, 255, 0, 0.6);
-            animation: rotate 20s infinite linear, glow 2s infinite ease-in-out;
-        }
-
-        .container {
             max-width: 400px;
-            background-color: #2b3036;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            z-index: 1;
-            position: relative; /* Added for positioning the button */
-        }
-
-        .chat-name {
-            font-size: 32px;
-            font-weight: bold;
-            color: #ffcc00;
-            margin-bottom: 15px;
-        }
-
-        .chat-description {
-            font-size: 18px;
-            color: #b0b3b8;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        .create-chat {
-            background: linear-gradient(90deg, #ff7e5f, #feb47b);
-            color: white;
-            border: none;
-            padding: 15px;
-            width: 100%;
+            padding: 20px;
+            background-color: #fff;
             border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.5s ease, transform 0.3s ease;
-            background-size: 200% 200%;
-            animation: gradient-flow 3s ease infinite;
-            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            text-align: center;
         }
 
-        .create-chat:hover {
-            transform: scale(1.05);
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
-        .enter-chat {
-            background: linear-gradient(90deg, #ff7e5f, #feb47b); /* Matching color with create-chat */
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
             color: white;
             border: none;
-            padding: 15px; /* Adjusted padding */
-            width: 100%; /* Match width */
-            border-radius: 8px; /* Match border-radius */
-            font-size: 18px; /* Match font size */
-            font-weight: bold; /* Match font weight */
+            border-radius: 4px;
             cursor: pointer;
-            transition: background 0.5s ease;
-            margin-top: 15px; /* Added margin for spacing */
+            font-size: 16px;
         }
 
-        .enter-chat:hover {
-            background: #feb47b; /* Adjust hover color */
+        button:hover {
+            background-color: #2980b9;
         }
 
-        @keyframes gradient-flow {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+        #chat-box {
+            height: 300px;
+            overflow-y: auto;
+            background-color: #ecf0f1;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
         }
 
-        .modal-content {
-            background-color: #2b3036;
-            color: white;
-        }
-
-        .modal-header {
-            border-bottom: 1px solid #ffcc00;
-        }
-
-        .modal-footer {
-            border-top: 1px solid #ffcc00;
-        }
-
-        .footer {
-            margin-top: 20px;
+        #chat-box p {
+            margin: 5px 0;
             font-size: 14px;
-            color: #888;
         }
 
-        .private-link {
-            margin-top: 10px;
-            color: #ffc107;
-            display: none;
+        #message-input {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
-        .hidden {
-            display: none;
+        #send-message {
+            width: 18%;
+            padding: 10px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #send-message:hover {
+            background-color: #27ae60;
         }
     </style>
 </head>
 <body>
 
-<div class="background">
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-    <div class="circle"></div>
-</div>
-
-<div class="container">
-    <div class="chat-name">Eclipse Chat</div>
-    <div class="chat-description">
-        Занурюйся у світ тіней, де кожне слово приховує загадку. Спілкуйся без зайвих очей, розкривай секрети лише тим, кому довіряєш. Ласкаво просимо до Eclipse — де тиша каже більше, ніж слова.
-    </div>
-    <button class="create-chat btn btn-primary btn-block" data-toggle="modal" data-target="#createChatModal">Створити чат</button>
+    <h2>WebSocket Chat</h2>
     
-    <button class="enter-chat btn btn-primary" onclick="window.location.href='login.html'">Увійти в чат</button>
-</div>
-
-<div id="createChatModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Створення нового чату</h4>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="chatName">Назва чату:</label>
-                        <input type="text" class="form-control" id="chatName" placeholder="Введіть назву чату">
-                    </div>
-                    <div class="form-group">
-                        <label for="chatDescription">Опис чату:</label>
-                        <textarea class="form-control" id="chatDescription" placeholder="Введіть опис чату"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="chatType">Тип чату:</label><br>
-                        <label class="radio-inline"><input type="radio" name="chatType" value="public" checked> Публічний</label>
-                        <label class="radio-inline"><input type="radio" name="chatType" value="private"> Приватний</label>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="createChatButton">Створити</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Закрити</button>
-            </div>
-        </div>
-
+    <div id="connect-section">
+        <button id="new-chat">Создать новый чат</button>
+        <input type="text" id="existing-key" placeholder="Введите ключ для подключения">
+        <button id="join-chat">Подключиться по ключу</button>
     </div>
-</div>
 
-<div id="passwordModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Встановлення паролю для чату</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="chatPassword">Пароль чату:</label>
-                    <input type="password" class="form-control" id="chatPassword" placeholder="Введіть пароль">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="setPasswordButton">Зберегти пароль</button>
-            </div>
-        </div>
-
+    <div id="registration-section" style="display: none;">
+        <input type="text" id="nickname" placeholder="Введите ваше имя" />
+        <button id="register">Зарегистрироваться</button>
     </div>
-</div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <div id="nickname-section" style="display: none;">
+        <input type="text" id="nickname-input" placeholder="Введите ваше имя" />
+        <button id="nickname-submit">Подключиться</button>
+    </div>
 
-<script>
-    var chatLink = ""; 
+    <div id="chat-section" style="display: none;">
+        <p id="session-info"></p>
+        <div id="chat-box"></div>
+        <input type="text" id="message-input" placeholder="Введите сообщение" />
+        <button id="send-message">Отправить</button>
+    </div>
 
-    document.getElementById("createChatButton").addEventListener("click", function() {
-        var chatName = document.getElementById("chatName").value;
-        var chatDescription = document.getElementById("chatDescription").value;
-        var chatType = document.querySelector('input[name="chatType"]:checked').value;
+    <script>
+        let ws;
+        let sessionKey = null;
+        let nickname = null;
 
-        if (chatName && chatDescription) {
-            if (chatType === "private") {
-                chatLink = "https://eclipsechat.com/private/" + Math.random().toString(36).substring(7);
+        document.getElementById("new-chat").addEventListener("click", () => {
+            document.getElementById("connect-section").style.display = "none";
+            document.getElementById("registration-section").style.display = "block";
+        });
+
+        document.getElementById("join-chat").addEventListener("click", () => {
+            const key = document.getElementById("existing-key").value.trim();
+            if (key) {
+                sessionKey = key;
+                document.getElementById("connect-section").style.display = "none";
+                document.getElementById("nickname-section").style.display = "block";
             } else {
-                chatLink = "https://eclipsechat.com/public/" + Math.random().toString(36).substring(7);
-                $('#passwordModal').modal('show'); 
+                alert("Пожалуйста, введите ключ для подключения.");
             }
-            $('#createChatModal').modal('hide');
-        } else {
-            alert("Будь ласка, заповніть всі поля.");
-        }
-    });
+        });
 
-    document.getElementById("setPasswordButton").addEventListener("click", function() {
-        var password = document.getElementById("chatPassword").value;
-        if (password) {
-            alert("Пароль встановлено: " + password);
-            $('#passwordModal').modal('hide');
-        } else {
-            alert("Будь ласка, введіть пароль.");
-        }
-    });
+        document.getElementById("nickname-submit").addEventListener("click", () => {
+            nickname = document.getElementById("nickname-input").value.trim();
+            if (nickname) {
+                document.getElementById("nickname-section").style.display = "none";
+                connectWebSocket('join_chat');
+            } else {
+                alert("Пожалуйста, введите ваше имя.");
+            }
+        });
 
-    document.getElementById("enterChatButton").addEventListener("click", function() {
-        if (chatLink) {
-            window.location.href = chatLink;
-        }
-    });
-</script>
+        document.getElementById("register").addEventListener("click", () => {
+            nickname = document.getElementById("nickname").value.trim();
+            if (nickname) {
+                document.getElementById("registration-section").style.display = "none";
+                connectWebSocket('new_chat');
+            } else {
+                alert("Пожалуйста, введите ваше имя.");
+            }
+        });
 
+        function connectWebSocket(action) {
+            ws = new WebSocket("ws://localhost:5000");
+
+            ws.onopen = () => {
+                console.log("Connected to server");
+
+                if (action === 'new_chat') {
+                    ws.send(JSON.stringify({ type: 'new_chat', nickname: nickname }));
+                } else if (action === 'join_chat') {
+                    ws.send(JSON.stringify({ type: 'join_chat', key: sessionKey, nickname: nickname }));
+                }
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+
+                if (message.type === 'session_key') {
+                    sessionKey = message.key;
+                    document.getElementById("session-info").textContent = `Ваш ключ сессии: ${sessionKey}`;
+                    document.getElementById("connect-section").style.display = "none";
+                    document.getElementById("chat-section").style.display = "block";
+                }
+
+                if (message.type === 'joined') {
+                    document.getElementById("session-info").textContent = `Подключен к чату с ключом: ${sessionKey}`;
+                    document.getElementById("connect-section").style.display = "none";
+                    document.getElementById("chat-section").style.display = "block";
+                }
+
+                if (message.type === 'error') {
+                    alert(`Ошибка: ${message.message}`);
+                }
+
+                if (message.type === 'chat_message') {
+                    const chatBox = document.getElementById("chat-box");
+                    const newMessage = document.createElement("p");
+                    newMessage.textContent = `${message.nickname}: ${message.message}`;
+                    chatBox.appendChild(newMessage);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            };
+
+            ws.onclose = () => {
+                console.log("Disconnected from server");
+            };
+        }
+
+        document.getElementById("send-message").addEventListener("click", () => {
+            const messageInput = document.getElementById("message-input");
+            const message = messageInput.value.trim();
+
+            if (message && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'message', message: message }));
+                messageInput.value = "";
+            }
+        });
+    </script>
 </body>
 </html>
-

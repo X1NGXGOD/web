@@ -1,72 +1,65 @@
-const express = require("express");
-const path = require("path");
-const http = require("http");
-const WebSocket = require("ws");
-const { v4: uuidv4 } = require('uuid');
+const WebSocket = require('ws');
+const { v4: uuidv4 } = require('uuid'); 
 
-const app = express();
-const port = process.env.PORT || 5000;
+const wss = new WebSocket.Server({ port: 5000 });
+const sessions = {};
 
-app.use(express.static(path.join(__dirname, 'public')));
+console.log('WebSocket сервер запущен на порту 5000');
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'main.html'));
-});
+wss.on('connection', (ws) => {
+  let sessionKey = null;
+  let nickname = null;
 
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+  ws.on('message', (message) => {
+    const data = JSON.parse(message);
 
-const clients = new Map();
+    if (data.type === 'new_chat') {
+      sessionKey = uuidv4(); 
+      nickname = data.nickname;
 
-function broadcast(data, ws) {
-    wss.clients.forEach(client => {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(data);
+      ws.send(JSON.stringify({ type: 'session_key', key: sessionKey }));
+
+      if (!sessions[sessionKey]) {
+        sessions[sessionKey] = [];
+      }
+      sessions[sessionKey].push({ ws, nickname });
+      console.log(`Новый чат создан с ключом: ${sessionKey}`);
+    }
+
+    else if (data.type === 'join_chat') {
+      sessionKey = data.key;
+
+      if (sessions[sessionKey]) {
+        nickname = `Guest_${Math.floor(Math.random() * 1000)}`; 
+        sessions[sessionKey].push({ ws, nickname });
+        ws.send(JSON.stringify({ type: 'joined', message: `Подключен к чату с ключом: ${sessionKey}` }));
+        console.log(`Пользователь подключился к чату с ключом: ${sessionKey}`);
+      } else {
+        ws.send(JSON.stringify({ type: 'error', message: 'Чат с таким ключом не найден' }));
+      }
+    }
+
+    else if (data.type === 'message' && sessionKey && sessions[sessionKey]) {
+      const messageToSend = JSON.stringify({ type: 'chat_message', message: data.message, nickname: nickname });
+      
+      sessions[sessionKey].forEach((client) => {
+        if (client.ws.readyState === WebSocket.OPEN) {
+          client.ws.send(messageToSend);
         }
-    });
-}
+      });
+      console.log(`Сообщение отправлено всем по ключу ${sessionKey}: ${data.message}`);
+    }
+  });
 
-wss.on('connection', ws => {
-    const clientID = uuidv4(); 
-    clients.set(clientID, { ws, name: null });
-
-    console.log(`New client connected: ${clientID}`);
-
-    ws.send(JSON.stringify({
-        type: 'session',
-        sessionID: clientID
-    }));
-
-    ws.on('message', message => {
-        const parsedMessage = JSON.parse(message);
-
-        switch (parsedMessage.type) {
-            case 'name': 
-                clients.get(clientID).name = parsedMessage.name;
-                console.log(`Client ${clientID} set name to ${parsedMessage.name}`);
-                break;
-
-            case 'message': 
-                const clientName = clients.get(clientID).name || 'Anonymous';
-                const dataToSend = JSON.stringify({
-                    type: 'message',
-                    name: clientName,
-                    message: parsedMessage.message
-                });
-                broadcast(dataToSend, ws);
-                break;
-
-            default:
-                console.log(`Unknown message type: ${parsedMessage.type}`);
-        }
-    });
-
-    ws.on('close', () => {
-        console.log(`Client disconnected: ${clientID}`);
-        clients.delete(clientID);
-    });
-});
-
-server.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  ws.on('close', () => {
+    if (sessionKey && sessions[sessionKey]) {
+      sessions[sessionKey] = sessions[sessionKey].filter(client => client.ws !== ws);
+      console.log(`Клиент отключен от ключа ${sessionKey}`);
+      
+      if (sessions[sessionKey].length === 0) {
+        delete sessions[sessionKey];
+        console.log(`Сессия с ключом ${sessionKey} удалена`);
+      }
+    }
+  });
 });
