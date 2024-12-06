@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Chat</title>
+    <title>WebSocket Чат</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -97,29 +97,29 @@
 </head>
 <body>
 
-    <h2>WebSocket Chat</h2>
+    <h2>WebSocket Чат</h2>
     
     <div id="connect-section">
-        <button id="new-chat">Создать новый чат</button>
-        <input type="text" id="existing-key" placeholder="Введите ключ для подключения">
-        <button id="join-chat">Подключиться по ключу</button>
+        <button id="new-chat">Створити новий чат</button>
+        <input type="text" id="existing-key" placeholder="Введіть ключ для підключення">
+        <button id="join-chat">Підключитися за ключем</button>
     </div>
 
     <div id="registration-section" style="display: none;">
-        <input type="text" id="nickname" placeholder="Введите ваше имя" />
-        <button id="register">Зарегистрироваться</button>
+        <input type="text" id="nickname" placeholder="Введіть ваше ім'я" />
+        <button id="register">Зареєструватися</button>
     </div>
 
     <div id="nickname-section" style="display: none;">
-        <input type="text" id="nickname-input" placeholder="Введите ваше имя" />
-        <button id="nickname-submit">Подключиться</button>
+        <input type="text" id="nickname-input" placeholder="Введіть ваше ім'я" />
+        <button id="nickname-submit">Підключитися</button>
     </div>
 
     <div id="chat-section" style="display: none;">
         <p id="session-info"></p>
         <div id="chat-box"></div>
-        <input type="text" id="message-input" placeholder="Введите сообщение" />
-        <button id="send-message">Отправить</button>
+        <input type="text" id="message-input" placeholder="Введіть повідомлення" />
+        <button id="send-message">Надіслати</button>
     </div>
 
     <script>
@@ -139,7 +139,7 @@
                 document.getElementById("connect-section").style.display = "none";
                 document.getElementById("nickname-section").style.display = "block";
             } else {
-                alert("Пожалуйста, введите ключ для подключения.");
+                alert("Будь ласка, введіть ключ для підключення.");
             }
         });
 
@@ -149,7 +149,7 @@
                 document.getElementById("nickname-section").style.display = "none";
                 connectWebSocket('join_chat');
             } else {
-                alert("Пожалуйста, введите ваше имя.");
+                alert("Будь ласка, введіть ваше ім'я.");
             }
         });
 
@@ -159,7 +159,7 @@
                 document.getElementById("registration-section").style.display = "none";
                 connectWebSocket('new_chat');
             } else {
-                alert("Пожалуйста, введите ваше имя.");
+                alert("Будь ласка, введіть ваше ім'я.");
             }
         });
 
@@ -167,7 +167,7 @@
             ws = new WebSocket("ws://localhost:5000");
 
             ws.onopen = () => {
-                console.log("Connected to server");
+                console.log("Підключено до сервера");
 
                 if (action === 'new_chat') {
                     ws.send(JSON.stringify({ type: 'new_chat', nickname: nickname }));
@@ -181,19 +181,19 @@
 
                 if (message.type === 'session_key') {
                     sessionKey = message.key;
-                    document.getElementById("session-info").textContent = `Ваш ключ сессии: ${sessionKey}`;
+                    document.getElementById("session-info").textContent = `Ваш ключ сесії: ${sessionKey}`;
                     document.getElementById("connect-section").style.display = "none";
                     document.getElementById("chat-section").style.display = "block";
                 }
 
                 if (message.type === 'joined') {
-                    document.getElementById("session-info").textContent = `Подключен к чату с ключом: ${sessionKey}`;
+                    document.getElementById("session-info").textContent = `Підключено до чату з ключем: ${sessionKey}`;
                     document.getElementById("connect-section").style.display = "none";
                     document.getElementById("chat-section").style.display = "block";
                 }
 
                 if (message.type === 'error') {
-                    alert(`Ошибка: ${message.message}`);
+                    alert(`Помилка: ${message.message}`);
                 }
 
                 if (message.type === 'chat_message') {
@@ -206,7 +206,7 @@
             };
 
             ws.onclose = () => {
-                console.log("Disconnected from server");
+                console.log("Відключено від сервера");
             };
         }
 
